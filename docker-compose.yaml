@@ -1,0 +1,54 @@
+services:
+  backend:
+    build: ./backend
+    container_name: thousand-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - mongo
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: thousand-frontend
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+
+  postgres:
+    image: postgres:15
+    container_name: thousand-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: thousanddb
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:6
+    container_name: thousand-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:7
+    container_name: thousand-redis
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres-data:
+  mongo-data:
